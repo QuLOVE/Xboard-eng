@@ -19,7 +19,7 @@ class XboardUpdate extends Command
      *
      * @var string
      */
-    protected $description = 'xboard 更新';
+    protected $description = 'xboard update';
 
     /**
      * Create a new command instance.
@@ -38,10 +38,10 @@ class XboardUpdate extends Command
      */
     public function handle()
     {
-        $this->info('正在导入数据库请稍等...');
+        $this->info('Please wait while the database is being imported...');
             \Artisan::call("migrate");
             $this->info(\Artisan::output());
         \Artisan::call('horizon:terminate');
-        $this->info('更新完毕，队列服务已重启，你无需进行任何操作。');
+        $this->info('The update is complete, the queue service has been restarted and you dont need to do anything.');
     }
 }
