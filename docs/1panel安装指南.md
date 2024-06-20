@@ -1,40 +1,39 @@
-当然可以。以下是增强了步骤性的部署教程：
+#  Xboard installation guide: the 1panel edition -  let's get this bread
 
-# 1panel 部署教程
+Yo, so you wanna set up Xboard using 1panel? I got you. This guide's gonna walk you through it step-by-step, like a recipe for digital domination.
 
-本文将介绍如何使用 1panel 快速部署 Xboard。
+##  Installation - its easier than u think
 
-## 安装部署
+### Step 1: get 1panel up and runnin
 
-### 步骤 1：安装 1panel
+1.  **Install 1panel:**  Open your terminal and drop this command like it's hot:
 
-1. 执行以下命令安装 1panel：
-
-    ```
+    ```bash
     curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
     ```
 
-2. 安装完成后，登录 1panel 进行环境的安装。
+2.  **Login and set it up:** Once 1panel's installed, login with your credentials and set up your environment.
 
-### 步骤 2：安装应用
+### Step 2: Install the necessary apps
 
-1. 打开应用商店，安装以下应用：
+1.  **Head to the app store:** In your 1panel dashboard, navigate to the "App Store" section.
+2.  **Install time:** You're gonna need:
 
-    - ☑️ OpenResty 任意版本 （<span style="color:yellow">安装时需要勾选 "端口外部访问" 来打开防火墙</span>>
-    - ☑️ MySQL 5.7.\* （arm 架构可以选择 mariadb 进行代替）
+    *   **OpenResty (Any version):** Make sure you check the "External Access for Port" option during installation to open the firewall.
+    *   **MySQL 5.7.\***: If you're on an ARM architecture, MariaDB can roll with it too.
 
-    <span style="color:yellow">⚠️ ：安装过程中配置默认即可。</span>
+    **Pro tip:**  Keep the default settings during the installation process unless you really know what you're doing.
 
-### 步骤 3：添加站点
+### Step 3: Set up ur site
 
-1. 在 1panel 面板中，选择“网站”并点击“创建网站”，然后选择“反向代理”。
-2. 在 “主域名” 中填写你指向服务器的域名，
-3. 在 “代号” 中填写 `xboard`
-4. 在 “在代理地址” 中填写 `127.0.0.1:7001`，
-5. 最后点击“创建”按钮。
-6. 点击刚创建的网站的 "配置" > "反向代理" > "源文" 修改反向代理规则为以下内容：
+1.  **Create a website:**  Go to "Websites" in your 1panel dashboard and hit the "Create Website" button. Choose "Reverse Proxy" as the site type.
+2.  **Fill in the blanks:**
+    *   **Main Domain:** Enter the domain name you pointed to your server.
+    *   **Code:**  Type in `xboard`.
+    *   **Proxy Address:** Enter `127.0.0.1:7001`.
+3.  **Create and configure:** Hit the "Create" button and then go to "Configure" \> "Reverse Proxy" \> "Source Text" for your newly created site. Replace the existing rules with the following:
 
-    ```
+    ```nginx
     location ^~ / {
         proxy_pass http://127.0.0.1:7001;
         proxy_http_version 1.1;
@@ -52,72 +51,73 @@
     }
     ```
 
-### 步骤 4：创建数据库
+### Step 4: create the DB
 
-1. 在 1panel 面板中，选择“数据库”并点击“创建数据库”。
-2. 在“名称”中填写 `xboard`。
-3. 在“用户”中填写 `xboard`。
-4. 在“权限”中选择“所有人(%)”。
-5. 最后点击“创建”按钮。
-6. 记住数据库账号密码进行下一步
+1.  **Database time:** Head to the "Database" section in your 1panel dashboard and click "Create Database."
+2.  **Details, details:** 
+    *   **Name:**  Enter `xboard`.
+    *   **User:**  Enter `xboard`.
+    *   **Permissions:** Select "Everyone (%)".
+3.  **Create and remember:**  Hit that "Create" button and keep the database credentials safe. You'll need them later.
 
-### 步骤 5：安装 Xboard
+### Step 5: install Xboard
 
-1. 通过 SSH 登录到服务器后，访问站点路径如：`/opt/1panel/apps/openresty/openresty/www/sites/xboard/index`。
-2. 如果系统没有安装 git，请执行以下命令安装 git：
+1.  **SSH to ur server:**  Log in to your server via SSH.
+2.  **Navigate to ur site path:**  Go to your site's directory. It should look something like this: `/opt/1panel/apps/openresty/openresty/www/sites/xboard/index`.
+3.  **Install git (if needed):**  If Git isn't installed on your system, use these commands:
 
-    - Ubuntu/Debian：
+    *   **Ubuntu/Debian:**
 
-        ```
+        ```bash
         apt update
         apt install -y git
         ```
 
-    - CentOS/RHEL：
+    *   **CentOS/RHEL:**
 
-        ```
+        ```bash
         yum update
         yum install -y git
         ```
 
-3. 在站点目录中执行以下命令从 Github 克隆到当前目录：
+4.  **Clone the Xboard repository:** Execute the following command within your site's directory:
 
-    ```
-    git clone -b  docker-compose --depth 1 https://github.com/cedar2025/Xboard ./
+    ```bash
+    git clone -b docker-compose --depth 1 https://github.com/cedar2025/Xboard ./
     ```
 
-4. 执行以下命令安装 Xboard：
+5.  **Run the installation command:** 
 
-    ```
+    ```bash
     docker compose run -it --rm xboard php artisan xboard:install
     ```
 
-5. 根据提示输入上述创建的数据库账号密码，选择使用内置 redis 完成安装。  
-   执行这条命令之后，会返回你的后台地址和管理员账号密码（你需要记录下来）。  
-   你需要执行下面的“启动 Xboard”步骤之后才能访问后台。
+6.  **Enter ur credentials:** Follow the prompts and enter the database credentials you saved earlier. Choose to use the built-in Redis for installation.
+7.  **Save ur credentials:**  This command will provide you with your backend URL and admin login credentials. Keep them in a safe place. 
 
-### 步骤 6：启动 Xboard
+### Step 6: start xboard
 
-在站点目录中执行以下命令：
+1.  **Start the engine:** In your site directory, run:
 
-```
-docker compose up -d
-```
-
-🎉： 到这里，你已经可以通过域名访问你的站点了。
-
-## 更新
-
-1. 通过 SSH 登录到服务器后，访问站点路径如：`/opt/1panel/apps/openresty/openresty/www/sites/xboard/index`，然后在站点目录中执行以下命令：
-
+    ```bash
+    docker compose up -d
     ```
+
+🎉 **U'r live!** You should now be able to access your Xboard panel using the domain name you set up earlier.
+
+## Updating xboard - stay fresh
+
+1.  **SSH and navigate:** Log in to your server via SSH and go to your Xboard site directory. 
+2.  **Update, pull, up:** Run these commands:
+
+    ```bash
     docker compose down xboard
     docker compose pull 
     docker compose up -d
     ```
 
-🎉： 在此，你已完成 Xboard 的更新。
+🎉 **That's a wrap!**  You've successfully updated Xboard. Keep crushin' it!
 
-## 注意
+## Keep in mind
 
--   启用 webman 后做的任何代码修改都需要重启生效。
+*   **Webman restarts:** Any code changes you make after enabling Webman will require a restart for them to take effect.

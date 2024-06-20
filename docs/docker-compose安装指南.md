@@ -1,70 +1,87 @@
-## Docker-Compose 部署教程
-本文教你如何在命令行使用docker-compose + sqlite来快速部署Xboard  
-如果你需要使用Mysql，你需要自行处理好Mysql的安装。
-### 部署 (使用docker-compose 2分钟部署)
-> 在此提供Xboard安装、快速体验Xboard的步骤。   
-使用docker compose + sqlite 快速部署站点（**无需安装Mysql以及redis**）
-1. 安装docker
-```
-curl -sSL https://get.docker.com | bash
-systemctl enable docker
-systemctl start docker
-```
-2. 获取Docker compose 文件
-```
-git clone -b  docker-compose --depth 1 https://github.com/cedar2025/Xboard
-cd Xboard
-```
-3. 执行数据库安装命令
-> 选择 **启用sqlite** 和 **Docker内置的Redis**
-```
-docker compose run -it --rm xboard php artisan xboard:install
-```
-> 执行这条命令之后，会返回你的后台地址和管理员账号密码（你需要记录下来）  
-> 你需要执行下面的 **启动xborad** 步骤之后才能访问后台
+#  Xboard installation guide:  the Docker compose express lane -  get up and runnin in 2 Minutes flat
 
-4. 启动Xboard
-```
-docker compose up -d
-```
-> 安装完成之后即可访问你的站点
-5. 访问站点 
-> 启动之后网站端口默认为7001, 你可以配置nginx反向代理使用80端口  
+This guide's gonna show you how to get Xboard rollin' using Docker Compose and SQLite. It's the quickest, cleanest way to get your hands dirty with Xboard.  
 
-网站地址:   http://你的IP:7001/   
-在此你已经成功部署了, 你可以访问网址体验Xboard的完整功能， 
+**MySQL not invited (Yet):**  We're keeping it simple for now.  If you need MySQL, you'll have to install and configure that yourself. Don't worry, we got you covered with separate instructions for that.
 
-> 如果你需要使用mysql，请自行安装Mysql后重新部署
+## Deployment:  faster than u can say "Docker compose"
 
-### **更新**
-1. 修改版本
-```
-cd Xboard
-vi docker-compose.yaml
-```
-> 修改docker-compose.yaml 当中image后面的版本号为你需要的版本  
-> 如果为版本为latest 则可以忽略这一步，直接进行第二步
+1. **Get Docker on ur system:** 
 
-2. 更新数据库（可以执行多次都是安全的）
-```
-docker compose pull
-docker compose down
-docker compose run -it --rm xboard php artisan xboard:update
-docker compose up -d
-```
-> 即可更新成功
+   ```bash
+   curl -sSL https://get.docker.com | bash
+   systemctl enable docker
+   systemctl start docker
+   ```
 
-### **回滚**
-> 此回滚不回滚数据库，是否回滚数据库请查看相关文档
-1. 回退版本  
-```
-vi docker-compose.yaml
-```
-> 修改docker-compose.yaml 当中image后面的版本号为更新前的版本号
-2. 启动
-```
-docker compose up -d
-```
+2. **Grab the Docker compose file:**
 
-### 注意
-启用webman后做的任何代码修改都需要重启生效
+   ```bash
+   git clone -b docker-compose --depth 1 https://github.com/cedar2025/Xboard
+   cd Xboard
+   ```
+
+3. **Install the DB (SQLite Style):**
+
+   ```bash
+   docker compose run -it --rm xboard php artisan xboard:install
+   ```
+   * **Keep it Simple:** Choose "Enable SQLite" and "Docker Built-in Redis" during the installation.
+   * **Save Your Credentials:** This command will give you your backend URL and admin login. Guard them with your life (or at least write them down somewhere safe).
+
+4. **Start Xboard:**
+
+   ```bash
+   docker compose up -d
+   ```
+   * **You're Live!**  You can now access your Xboard site. The default port is 7001, but you can set up a reverse proxy with Nginx to use port 80 if you're feeling fancy.
+
+5. **Access ur site:**
+
+   *  Go to: `http://your-server-ip:7001/`
+
+   **Congratulations!** You've got a fully functional Xboard installation.
+
+**Need MySQL?** No problem. Install it separately and then follow the Docker Compose instructions again.
+
+## Updating:  keep it fresh
+
+1. **Change the version (if needed):**
+
+   * Go to your Xboard directory and open up the `docker-compose.yaml` file:
+
+      ```bash
+      cd Xboard
+      vi docker-compose.yaml
+      ```
+
+   * Find the line that starts with `image:` and change the version number to the version you want. If you're using the latest version (`latest`), you can skip this step.
+
+2. **Update:**
+
+   ```bash
+   docker compose pull
+   docker compose down
+   docker compose run -it --rm xboard php artisan xboard:update
+   docker compose up -d
+   ```
+
+**Boom!**  Updated and ready to rock.
+
+## Rolling Back:  oops, my bad
+
+This rollback process doesn't touch your database.  Check the Xboard docs for details on how to roll back your database if you need to.
+
+1.  **Change the version:** 
+
+    *   Open the `docker-compose.yaml` file (in your Xboard directory) and change the version number in the `image:` line back to the previous version you were using.
+
+2. **Start it up:**
+
+   ```bash
+   docker compose up -d
+   ```
+
+##  Keep in mind:
+
+*   **Webman restarts:** If you enabled Webman and made code changes, you'll need to restart it for those changes to take effect. 

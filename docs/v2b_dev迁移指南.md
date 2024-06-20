@@ -1,56 +1,74 @@
-## V2borad Dev版本迁移指南
-> 请先按照官方升级指导升级到 2023/10/27的版本后再执行迁移操作
+# Migrating from V2Board Dev -  get with the times, hommie
 
-### 迁移脚本会对你的数据库做以下更改
-- v2_order
-    - 添加 `surplus_order_ids` 字段 类型 text nullable 折抵订单
-- v2_plan（影响功能：周期价值、 流量价值）
-     - 删除 `daily_unit_price`  字段
-     - 删除 `transfer_unit_price` 字段
-- v2_server_hysteria （影响：Ignore Client Bandwidth 配置和混淆类型配置）
-     - 删除 `ignore_client_bandwidth` 字段
-     - 删除 `obfs_type` 字段
+This guide's gonna show you how to migrate from V2Board Dev (specifically the 2023/10/27 version) to the dope world of Xboard.  Database changes, file moves, the whole nine yards. 
 
-## 迁移之前
-迁移之前你需要执行正常安装步骤(记得不可选择Sqlite)
-> sqlite迁移请自行学习相关知识  
-- [Docker Compose 纯命令行快速部署](./docs/docker-compose安装指南.md)
-- [aapanel + Docker Compose](./docs/aapanel+docker安装指南.md)
-- [aapanel 部署](./docs/)
+## Database changes  -  the rundown
 
-## 开始迁移
-> 针对docker与非docker用户提供不同的迁移步骤，你根据你的安装环境选择其一即可。
+Here's the lowdown on what's about to go down in your database:
 
-### docker 环境
-> 以下命令需要你打开SSH进入到项目目录进行执行 
-1. 停止Xboard
-```
-docker compose down
-```
-2. 清空数据库
-```
-docker compose run -it --rm xboard php artisan db:wipe
-```
-3. 导入旧数据库<span style="color:red">(重要)</span>数据库
->导入你dev v2board的数据库到当前数据库当中
+* **`v2_order` Table:**  
+   *  Adding a new field called `surplus_order_ids` (text, nullable) to track those extra order IDs. 
+* **`v2_plan` Table (Important for Cycle and Traffic Value Calculations):**
+   * Removing the `daily_unit_price` field - we don't need that anymore.
+   *  Removing the `transfer_unit_price` field - out with the old!
+* **`v2_server_hysteria` Table (affects "Ignore Client Bandwidth" and "Obfuscation Type" Settings):**
+   * Removing the `ignore_client_bandwidth` field - bye, bye!
+   * Removing the `obfs_type` field - it's gone, baby, gone!
 
-4. 执行迁移命令
-```
-docker compose run -it --rm xboard php artisan migratefromv2b dev231027
-```
-## aapanel 环境
-1. 清空数据库
-```
-php artisan db:wipe
-```
-2. 导入旧数据库<span style="color:red">(重要)</span>数据库
->导入你dev v2board的数据库到当前数据库当中
+##  Before u start - listen up!
 
-3. 执行迁移命令
-```
-php artisan migratefromv2b dev231027
-```
+1. **Update V2Board:** Before you even THINK about migrating, make sure your V2Board Dev installation is updated to the **2023/10/27** version. Follow the official V2Board upgrade instructions to get there.
 
-> 上述迁移完成之后你需要进行 配置文件迁移
-## config/v2board.php 配置文件迁移 [点击查看步骤](./config迁移指南.md)
-> xboard将配置储存到数据库， 不再使用file进行储存，你需要对配置文件进行迁移。
+2. **Fresh Xboard install (no SQLite):**  Once V2Board's up-to-date, install a fresh copy of Xboard.  And don't even TRY using SQLite for this - pick a different database type. 
+
+   *  Need help with the installation?  Check these guides:
+      * [Docker Compose (Command Line)](./docs/docker-compose安装指南.md)
+      * [aaPanel + Docker Compose](./docs/aapanel+docker安装指南.md)
+      *  [aaPanel](./docs/)
+
+3. **SQLite? good luck:**  If you're using SQLite, you're on your own for the migration.
+
+##  Let's migrate!
+
+###  Docker environments
+
+1. **SSH time:**  SSH into your server and navigate to your Xboard project directory.
+2.  **Stop Xboard:**
+
+    ```bash
+    docker compose down
+    ```
+
+3.  **Wipe the DB:**
+
+    ```bash
+    docker compose run -it --rm xboard php artisan db:wipe
+    ```
+
+4. **Import ur DB (dont mess this up):** Import your V2Board Dev database into the newly created Xboard database.  
+
+5. **Migrate:**
+
+    ```bash
+    docker compose run -it --rm xboard php artisan migratefromv2b dev231027
+    ```
+
+### aaPanel environments
+
+1.  **Wipe the DB:** 
+
+    ```bash
+    php artisan db:wipe
+    ```
+
+2.  **Import ur old database (Seriously, Don't Forget This):**  Import your V2Board Dev database into the Xboard database. 
+
+3.  **Migrate:**
+
+    ```bash
+    php artisan migratefromv2b dev231027
+    ```
+
+##  Migrate that config file - 1 last thing
+
+After the database migration's done, you gotta migrate the `config/v2board.php` file. Xboard's gone digital and stores those settings in the database now.  Head to the [Config File Migration Guide](./config迁移指南.md) for the steps. 

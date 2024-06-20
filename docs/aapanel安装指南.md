@@ -1,154 +1,190 @@
-## aapanel部署指南
-> 本文将教你如何使用aapanel进行部署  
+# Xboard installation guide: The aaPanel edition - straight-up, no chaser
 
-<span style="color:red">⚠️：Centos7有部分反馈部署失败，请尽量避免使用Centos7进行部署</span> 
-### 安装
-1. 安装aaPanel 
+This guide's gonna walk you through setting up Xboard on aaPanel like a boss. Let's get this bread.
 
-```
-URL=https://www.aapanel.com/script/install_6.0_en.sh && if [ -f /usr/bin/curl ];then curl -ksSO "$URL" ;else wget --no-check-certificate -O install_6.0_en.sh "$URL";fi;bash install_6.0_en.sh aapanel
-```
+## Installation -  its bout to get real
 
-安装完成后我们登陆 aaPanel 进行环境的安装。
-2. 选择使用LNMP的环境安装方式勾选如下信息  
-☑️ Nginx 任意版本  
-☑️ MySQL 5.7  
-☑️ PHP 8.1 （如果没看到8.1先不选，去App Store安装）
-选择 Fast 快速编译后进行安装。
+**Word to the wise:** Some folks have had trouble getting Xboard up and running on CentOS 7. You might wanna use a different OS if you can.
 
-3. 安装扩展 
-> aaPanel 面板 > App Store > 找到PHP 8.1点击Setting > Install extentions选择以下扩展进行安装
-- redis
-- fileinfo
-- swoole4
-- readline
-- event
-- inotify (可选，热重载依赖)
+### Step 1: settin up aaPanel -  laying the groundwork
 
-4. 解除被禁止函数
-> aaPanel 面板 > App Store > 找到PHP 8.1点击Setting > Disabled functions 将以下函数从列表中删除
-- putenv
-- proc_open
-- pcntl_alarm
-- pcntl_signal
+1. **Install aaPanel:** Open your terminal and drop this command like a mixtape:
 
-5. 添加站点  
->aaPanel 面板 > Website > Add site。  
->>在 Domain 填入你指向服务器的域名  
->>在 Database 选择MySQL  
->>在 PHP Verison 选择PHP-81 
+   ```bash
+   URL=https://www.aapanel.com/script/install_6.0_en.sh && if [ -f /usr/bin/curl ];then curl -ksSO "$URL" ;else wget --no-check-certificate -O install_6.0_en.sh "$URL";fi;bash install_6.0_en.sh aapanel
+   ```
 
-6. 安装 Xborad  
->通过SSH登录到服务器后访问站点路径如：/www/wwwroot/你的站点域名。
->以下命令都需要在站点目录进行执行。
-```
-# 删除目录下文件
-chattr -i .user.ini
-rm -rf .htaccess 404.html 502.html index.html .user.ini
-```
-> 执行命令从 Github 克隆到当前目录。
-```
-git clone https://github.com/cedar2025/Xboard.git ./
-```
-> 执行命令安装依赖包以及V2board
-```
-sh init.sh
-```
-> 根据提示完成安装
-7. 配置站点目录及伪静态
-> 添加完成后编辑添加的站点 > Site directory > Running directory 选择 /public 保存。  
-> 添加完成后编辑添加的站点 > URL rewrite 填入伪静态信息。
-```
-location /downloads {
-}
+2. **Login and choose LNMP:**  Log in to your aaPanel dashboard and choose the "LNMP" environment for installation. Select these options:
 
-location / {  
-    try_files $uri $uri/ /index.php$is_args$query_string;  
-}
+   * **Nginx (Any version)** -  We roll with whatever you got.
+   * **MySQL 5.7** - The database king.
+   * **PHP 8.1** (install it from the App Store if you don't see it) - Powering the backend.
 
-location ~ .*\.(js|css)?$
-{
-    expires      1h;
-    error_log off;
-    access_log /dev/null; 
-}
-```
-8. 配置守护进程
->Xboard的系统强依赖队列服务，正常使用XBoard必须启动队列服务。下面以aaPanel中supervisor服务来守护队列服务作为演示。  
-- 1️⃣. aaPanel 面板 > App Store > Tools  
-- 2️⃣. 找到Supervisor进行安装，安装完成后点击设置 > Add Daemon按照如下填写
-- - 在 Name 填写 `Xboard`
-- - 在 Run User 选择 www  
-- - 在 Run Dir 选择 站点目录 在 Start Command 填写 `php artisan horizon` 在 Processes 填写 1  
+   Choose "Fast" for compilation and let it rip.
 
->填写后点击Confirm添加即可运行。
+3. **Extensions are key:**
 
-9. 配置定时任务#
-aaPanel 面板 > Cron。
-- 在 Type of Task 选择 Shell Script
-- 在 Name of Task 填写 v2board
-- 在 Period 选择 N Minutes 1 Minute
-- 在 Script content 填写 `php /www/wwwroot/路径/artisan schedule:run`
+   *  Go to **aaPanel Dashboard** > **App Store** > Find **PHP 8.1** > **Settings** > **Install extensions**.
+   *  Install these extensions: 
+      * `redis`
+      * `fileinfo`
+      * `swoole4`
+      * `readline`
+      * `event`
+      * `inotify` (optional, for hot reloading)
 
-根据上述信息添加每1分钟执行一次的定时任务。
+4. **Unleash the functions:**
 
+   * Go to **aaPanel Dashboard** > **App Store** > **PHP 8.1** > **Settings** > **Disabled functions**.
+   * Remove these functions from the list:
+      * `putenv`
+      * `proc_open`
+      * `pcntl_alarm`
+      * `pcntl_signal`
 
-### 开启webman
-> 在上述安装的基础上开启webman提高性能
+5. **Add ur site:**
 
-1. 配置php.ini
-> 通过SSH登录到服务器后访问站点路径如：/www/wwwroot/你的站点域名。
-```
-cp /www/server/php/81/etc/php.ini cli-php.ini
+   * Go to **aaPanel Dashboard** > **Website** > **Add Site**.
+   * Enter your domain name (make sure it's pointed at your server) in the **Domain** field.
+   * Choose **MySQL** for the database.
+   * Select **PHP-81** for the PHP version.
 
-sed -i 's/^disable_functions[[:space:]]*=[[:space:]]*.*/disable_functions=header,header_remove,headers_sent,http_response_code,setcookie,session_create_id,session_id,session_name,session_save_path,session_status,session_start,session_write_close,session_regenerate_id,set_time_limit/g' cli-php.ini
+6. **Install Xboard:**
 
-```
-2. 添加守护进程
->下面以aaPanel中supervisor服务来守护队列服务作为演示。  
-- 1️⃣. aaPanel 面板 > App Store > Tools 
-- 2️⃣. 找到Supervisor进行安装，安装完成后点击设置 > Add Daemon按照如下填写
-- - 在 Name 填写 webman
-- - 在 Run User 选择 www  
-- - 在 Run Dir 选择 站点目录 在 Start Command 填写 ```/www/server/php/81/bin/php -c cli-php.ini webman.php start``` 在 Processes 填写 1  
->填写后点击Confirm添加即可运行。
+   *  **SSH Time:** Log in to your server via SSH.
+   * **Navigate:** Go to your site's directory (e.g., `/www/wwwroot/your-domain-name`).
+   * **Clean House:** Delete these files:
 
-3. 修改伪静态
-> 站点设置 > URL Rewrite(伪静态) 填入一下内容<span style="color:red">(覆盖前伪静态配置)</span>
+     ```bash
+     chattr -i .user.ini
+     rm -rf .htaccess 404.html 502.html index.html .user.ini
+     ```
 
-```
-location ~* \.(jpg|jpeg|png|gif|js|css|svg|woff2|woff|ttf|eot|wasm|json|ico)$ {
+   * **Clone the code:**
 
-}
-location ~ .* {
-        proxy_pass http://127.0.0.1:7010;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Real-PORT $remote_port;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_set_header Scheme $scheme;
-        proxy_set_header Server-Protocol $server_protocol;
-        proxy_set_header Server-Name $server_name;
-        proxy_set_header Server-Addr $server_addr;
-        proxy_set_header Server-Port $server_port;
-  }
-```
+     ```bash
+     git clone https://github.com/cedar2025/Xboard.git ./
+     ```
 
-> 在此你的webman已经成功部署了
+   *  **Install:**
 
-### 更新
+     ```bash
+     sh init.sh
+     ```
 
-1. 更新代码
-> 通过SSH登录到服务器后访问站点路径如：/www/wwwroot/你的站点域名。
-```
-sh update.sh
-```
-2. 重启webman 守护进程(如果启用了webman)
-- 1️⃣. aaPanel 面板 > App Store > Tools 
-- 2️⃣. 找到Supervisor点击设置，找到名为webman的守护进程点击重启即可
+   * **Follow the prompts:**  Enter the required information when prompted.
 
+7. **Configure site directory & rewrite rules:**
 
-### 注意
-启用webman后做的任何代码修改都需要重启生效
+   * Go to your site's settings in aaPanel, then **Site directory** > **Running directory**, and select `/public`. Save those changes.
+   * Head over to **URL rewrite** and paste in these rules:
+
+     ```nginx
+     location /downloads {
+     }
+
+     location / {  
+         try_files $uri $uri/ /index.php$is_args$query_string;  
+     }
+
+     location ~ .*\.(js|css)?$
+     {
+         expires      1h;
+         error_log off;
+         access_log /dev/null; 
+     }
+     ```
+
+8. **Setting up the daemon process:** 
+
+   * Xboard needs its queues running, so we'll use Supervisor (from aaPanel) to keep things running smoothly.
+   *  Go to **aaPanel Dashboard** > **App Store** > **Tools**.
+   * Find and install **Supervisor**.
+   * Once installed, go to **Supervisor settings** > **Add Daemon**. 
+   * Fill in the details:
+     * **Name:** `Xboard`
+     * **Run User:** `www`
+     * **Run Dir:**  Your site's directory
+     * **Start Command:** `php artisan horizon`
+     * **Processes:**  `1`
+   * Hit "Confirm" and watch it go.
+
+9.  **Schedule those tasks:**
+
+    *   Go to **aaPanel dashboard** > **Cron**.
+    *   * **Type of task:** `Shell Script`
+        * **Name of task:** `v2board`
+        * **Period:** `N Minutes 1 Minute`
+        * **Script content:** `php /www/wwwroot/your-site-path/artisan schedule:run`
+
+    *   This sets up a cron job to run every minute. Make sure your path to the script is accurate!
+
+### Enabling Webman for maximum power
+
+Want to boost performance even further?  Webman's got your back.
+
+1. **Configure `php.ini`:** 
+
+   * SSH into your server and navigate to your site's directory.
+   * Execute these commands:
+
+     ```bash
+     cp /www/server/php/81/etc/php.ini cli-php.ini
+     sed -i 's/^disable_functions[[:space:]]*=[[:space:]]*.*/disable_functions=header,header_remove,headers_sent,http_response_code,setcookie,session_create_id,session_id,session_name,session_save_path,session_status,session_start,session_write_close,session_regenerate_id,set_time_limit/g' cli-php.ini
+     ```
+
+2. **Add the webman daemon:** 
+
+   *  Open up Supervisor in aaPanel (**aaPanel Dashboard** > **App Store** > **Tools**).
+   *   Go to settings and click **Add Daemon**.
+   *  Fill in the details:
+     * **Name:** `webman`
+     * **Run user:** `www`
+     * **Run dir:**  Your site's directory
+     * **Start command:**  `/www/server/php/81/bin/php -c cli-php.ini webman.php start`
+     * **Processes:**  `1`
+   *  Hit "Confirm" to get Webman rollin'.
+
+3.  **Rewrite the rules (again):**
+
+    *   Go to ur site's settings in aaPanel, then head to **URL Rewrite (Rewrite rules)** and replace the existing rules with these:
+
+        ```nginx
+        location ~* \.(jpg|jpeg|png|gif|js|css|svg|woff2|woff|ttf|eot|wasm|json|ico)$ {
+
+        }
+        location ~ .* {
+                proxy_pass http://127.0.0.1:7010;
+                proxy_http_version 1.1;
+                proxy_set_header Connection "";
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Real-PORT $remote_port;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header Host $http_host;
+                proxy_set_header Scheme $scheme;
+                proxy_set_header Server-Protocol $server_protocol;
+                proxy_set_header Server-Name $server_name;
+                proxy_set_header Server-Addr $server_addr;
+                proxy_set_header Server-Port $server_port;
+          }
+        ```
+
+    *   Now u r cookin' with Webman!
+
+### Updating Xboard - stay ahead of the game
+
+1.  **SSH and navigate:** You know the drill.  Log in to ur server via SSH and go to ur site's directory.
+2.  **Update Time:**
+
+    ```bash
+    sh update.sh
+    ```
+
+3.  **Restart Webman (if u r usin it):**
+
+    *   Head to Supervisor in aaPanel (**aaPanel Dashboard** > **App Store** > **Tools**).
+    *   Find the Webman daemon and hit the "Restart" button.
+
+### Word of wisdom
+
+Remember, if u'r using Webman, any code changes you make require a restart for those changes to take effect. 
