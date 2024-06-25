@@ -69,22 +69,22 @@ class StatController extends Controller
         foreach ($statistics as $statistic) {
             $date = date('m-d', $statistic['record_at']);
             $result[] = [
-                'type' => '收款金额',
+                'type' => 'Payment Amount',
                 'date' => $date,
                 'value' => $statistic['paid_total'] / 100
             ];
             $result[] = [
-                'type' => '收款笔数',
+                'type' => 'Payment Count',
                 'date' => $date,
                 'value' => $statistic['paid_count']
             ];
             $result[] = [
-                'type' => '佣金金额(已发放)',
+                'type' => 'Commission Amount (Paid)',
                 'date' => $date,
                 'value' => $statistic['commission_total'] / 100
             ];
             $result[] = [
-                'type' => '佣金笔数(已发放)',
+                'type' => 'Commission Count (Paid)',
                 'date' => $date,
                 'value' => $statistic['commission_count']
             ];
@@ -95,7 +95,7 @@ class StatController extends Controller
         ];
     }
 
-    // 获取当日实时流量排行
+    // Get today's real-time traffic ranking
     public function getServerLastRank()
     {
         $servers = [
@@ -129,7 +129,7 @@ class StatController extends Controller
             'data' => collect($statistics)->take(15)->all()
         ];
     }
-    // 获取昨日节点流量排行
+    // Get yesterday's node traffic ranking
     public function getServerYesterdayRank()
     {
         $servers = [
@@ -184,7 +184,7 @@ class StatController extends Controller
         $records = $builder->forPage($current, $pageSize)
             ->get();
 
-        // 追加当天流量
+        // Append today's traffic
         $recordAt = strtotime(date('Y-m-d'));
         $statService = new StatisticalService();
         $statService->setStartAt($recordAt);
